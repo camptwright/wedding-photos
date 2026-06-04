@@ -1,0 +1,219 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --gold: #c9a876;
+  --gold-soft: #e3cda8;
+  --ink: #0e0c0a;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Outfit', system-ui, sans-serif;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--ink);
+  font-family: var(--font-body);
+  cursor: none; /* hide cursor on the display */
+}
+
+#wall {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, #1a1613 0%, #0e0c0a 100%);
+}
+
+/* ─── Stages (crossfade layers) ──────────────────────────────────────────── */
+.stage {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.4s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.stage.active { opacity: 1; }
+
+.stage img, .stage video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Ken Burns: slow zoom + drift. Applied to the media inside the active stage. */
+@keyframes kenburns {
+  0%   { transform: scale(1.04) translate(0, 0); }
+  100% { transform: scale(1.16) translate(-1.5%, -1.5%); }
+}
+.stage.active img, .stage.active video {
+  animation: kenburns 9s ease-out forwards;
+}
+
+/* ─── Vignette ───────────────────────────────────────────────────────────── */
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%),
+    linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 28%);
+}
+
+/* ─── Caption ────────────────────────────────────────────────────────────── */
+.caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 3.5rem 4rem 3rem;
+  z-index: 5;
+  pointer-events: none;
+}
+.caption-inner {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.9s ease 0.5s, transform 0.9s ease 0.5s;
+}
+.caption-inner.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.caption-name {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.6rem, 3.5vw, 3rem);
+  color: #fff;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.7);
+  letter-spacing: 0.01em;
+}
+.fresh-badge {
+  display: none;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: clamp(0.7rem, 1.2vw, 1rem);
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--ink);
+  background: var(--gold-soft);
+  padding: 0.4em 1em;
+  border-radius: 999px;
+  margin-bottom: 0.9rem;
+  box-shadow: 0 4px 20px rgba(201, 168, 118, 0.4);
+}
+.fresh-badge.show {
+  display: inline-block;
+  animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.6); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ─── Top Bar ────────────────────────────────────────────────────────────── */
+.topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 2.5rem 4rem;
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 100%);
+}
+.couple {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(1.4rem, 2.6vw, 2.4rem);
+  color: #fff;
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.6);
+}
+.live-status {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: clamp(0.75rem, 1.1vw, 1rem);
+  color: rgba(255,255,255,0.85);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 300;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.6);
+}
+.live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #6fcf85;
+  box-shadow: 0 0 0 0 rgba(111, 207, 133, 0.6);
+  animation: pulse 2s infinite;
+}
+.live-dot.offline { background: #888; animation: none; }
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(111, 207, 133, 0.6); }
+  70% { box-shadow: 0 0 0 10px rgba(111, 207, 133, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(111, 207, 133, 0); }
+}
+
+/* ─── Overlay Messages ───────────────────────────────────────────────────── */
+.overlay-message {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  background: radial-gradient(ellipse at center, #1a1613 0%, #0e0c0a 100%);
+  transition: opacity 1s ease;
+  padding: 2rem;
+}
+.overlay-message.hidden { opacity: 0; pointer-events: none; }
+.overlay-message .ornament {
+  font-size: 2rem;
+  color: var(--gold);
+  letter-spacing: 0.5em;
+  margin-bottom: 1.5rem;
+  animation: fadeIn 1.5s ease;
+}
+.overlay-message h1 {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  letter-spacing: 0.04em;
+  margin-bottom: 1rem;
+}
+.overlay-message p {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.1rem, 2.2vw, 1.8rem);
+  color: var(--gold-soft);
+}
+.overlay-message .empty-hint {
+  font-family: var(--font-body);
+  font-style: normal;
+  font-size: clamp(0.8rem, 1.3vw, 1rem);
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.1em;
+  margin-top: 2rem;
+  text-transform: uppercase;
+}
+.error-message code {
+  background: rgba(255,255,255,0.1);
+  padding: 0.2em 0.6em;
+  border-radius: 6px;
+  font-family: monospace;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+@media (max-width: 768px) {
+  .topbar, .caption { padding-left: 1.5rem; padding-right: 1.5rem; }
+  .caption { padding-bottom: 2rem; }
+}

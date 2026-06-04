@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photo Wall</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Outfit:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/wall.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖼️</text></svg>">
+</head>
+<body>
+  <div id="wall">
+    <!-- Two stages for crossfade -->
+    <div class="stage" id="stage-a"></div>
+    <div class="stage" id="stage-b"></div>
+
+    <!-- Vignette + grain for depth -->
+    <div class="vignette"></div>
+
+    <!-- Caption overlay -->
+    <div class="caption" id="caption">
+      <div class="caption-inner">
+        <span class="fresh-badge" id="fresh-badge">Just Shared ✨</span>
+        <p class="caption-name" id="caption-name"></p>
+      </div>
+    </div>
+
+    <!-- Top bar: couple + live status -->
+    <div class="topbar">
+      <div class="couple" id="couple-names">Our Wedding</div>
+      <div class="live-status">
+        <span class="live-dot" id="live-dot"></span>
+        <span id="photo-count">0 memories</span>
+      </div>
+    </div>
+
+    <!-- Empty / connecting state -->
+    <div class="overlay-message" id="overlay-message">
+      <div class="ornament">✦</div>
+      <h1 id="empty-couple">Our Wedding</h1>
+      <p id="empty-text">Waiting for the first memory…</p>
+      <p class="empty-hint">Scan a QR code to share your photos</p>
+    </div>
+
+    <!-- Auth error -->
+    <div class="overlay-message error-message" id="error-message" style="display:none">
+      <h1>Access Key Required</h1>
+      <p>This photo wall link is missing or has an invalid key.</p>
+      <p class="empty-hint">Open it as <code>/wall?key=YOUR_WALL_TOKEN</code></p>
+    </div>
+  </div>
+
+  <script src="/js/wall.js"></script>
+</body>
+</html>

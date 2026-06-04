@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<!--
+  Wedding Photo Sync — launchd agent
+
+  Install:
+    1. Edit the ProgramArguments paths below to match your setup
+    2. Copy to ~/Library/LaunchAgents/
+       cp com.wedding.photosync.plist ~/Library/LaunchAgents/
+    3. Load:
+       launchctl load ~/Library/LaunchAgents/com.wedding.photosync.plist
+    4. Unload when done:
+       launchctl unload ~/Library/LaunchAgents/com.wedding.photosync.plist
+-->
+<dict>
+  <key>Label</key>
+  <string>com.wedding.photosync</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <!-- UPDATE THIS PATH to where you cloned the project -->
+    <string>/Users/YOUR_USERNAME/wedding-photos/scripts/sync-to-photos.sh</string>
+    <!-- UPDATE THIS PATH to your mounted/synced uploads directory -->
+    <string>/Volumes/wedding-uploads</string>
+    <!-- Album name in Apple Photos -->
+    <string>Wedding Photos</string>
+  </array>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/tmp/wedding-photosync.out.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/tmp/wedding-photosync.err.log</string>
+</dict>
+</plist>
