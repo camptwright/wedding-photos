@@ -3,24 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#faf8f4">
+  <meta name="theme-color" content="#FDF4E7">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>Wedding Photos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <div class="toast-container" id="toasts"></div>
+
+  <div class="bg-photo">
+    <img src="/img/couple.jpg" alt="">
+    <div class="bg-frost"></div>
+  </div>
 
   <div class="container">
     <div class="header">
-      <div class="couple-names">
-        <span id="name1">Bride</span>
-        <span class="ampersand">&amp;</span>
-        <span id="name2">Groom</span>
-      </div>
-      <div class="wedding-date" id="weddingDate"></div>
-      <div class="divider"></div>
+      <div id="couple-names" class="couple-names">Our Wedding</div>
+      <div id="wedding-date" class="wedding-date"></div>
+      <div class="header-divider"></div>
     </div>
 
     <!-- Screen 1: Welcome -->
@@ -28,68 +30,84 @@
       <div class="card">
         <h2>Share Your Moments</h2>
         <p>Help us capture every angle of this special day. Enter your name below to start uploading photos and videos.</p>
-        <div class="input-group">
-          <label for="guestName">Your Name</label>
-          <input type="text" id="guestName" placeholder="e.g. Sarah Johnson" autocomplete="name">
+        <div class="form-group">
+          <label class="form-label" for="guest-name">Your Name</label>
+          <input type="text" id="guest-name" class="form-input" placeholder="e.g. Sarah Johnson" autocomplete="name">
         </div>
-        <button class="btn btn-primary" id="btnStart" onclick="registerGuest()">
-          Start Uploading
-        </button>
+        <input type="hidden" id="table-id">
+        <button class="btn btn-primary" id="btn-enter" disabled>Start Uploading</button>
+        <p class="hint">Up to <span id="upload-max">50</span> photos &amp; videos</p>
       </div>
     </div>
 
     <!-- Screen 2: Upload -->
     <div class="screen" id="screen-upload">
       <div class="card">
-        <div class="status-bar">
-          <div>
-            <span class="count" id="uploadCount">0</span>
-            <span class="limit">/ <span id="maxUploads">30</span></span>
-          </div>
-          <div style="font-size:0.8rem;color:var(--olive);font-weight:500;">
-            <span id="remainingCount">30</span> remaining
+        <div class="upload-header">
+          <h2>Your Uploads</h2>
+          <p class="welcome-msg">Welcome, <span id="guest-display-name" class="welcome-name"></span></p>
+          <div class="counter-row">
+            <span><span id="upload-count" class="counter-num">0</span> files shared</span>
           </div>
         </div>
-        <div class="progress-track">
-          <div class="progress-fill" id="quotaBar" style="width:0%"></div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width:0%"></div>
         </div>
 
-        <div class="upload-zone" id="dropZone">
-          <span class="icon">📷</span>
-          <div class="label">Tap to choose or drop files</div>
-          <div class="sublabel">Photos &amp; videos · Max <span id="maxSizeMB">100</span>MB each</div>
-          <input type="file" id="fileInput" multiple accept="image/*,video/*,.heic,.heif,.mov,.mp4">
+        <div class="drop-zone" id="drop-zone">
+          <div class="camera-icon">📷</div>
+          <div class="drop-text">Tap to choose or drop files</div>
+          <div class="drop-hint">Photos &amp; videos · Max 100MB each</div>
+          <input type="file" id="file-input" multiple accept="image/*,video/*,.heic,.heif,.mov,.mp4">
         </div>
 
-        <ul class="file-queue" id="fileQueue"></ul>
-
-        <button class="btn btn-primary" id="btnUpload" onclick="uploadFiles()" style="display:none;">
-          <span id="btnUploadText">Upload Files</span>
-        </button>
-
-        <div class="limit-reached" id="limitReached" style="display:none;">
-          <div class="badge">✓ Upload limit reached</div>
-          <p style="font-size:0.85rem;color:var(--olive);">
-            You've shared the maximum number of files. Thank you!
-          </p>
+        <div class="upload-progress" id="upload-progress" style="display:none">
+          <div class="uploading-indicator">
+            <div class="spinner"></div>
+            <span id="uploading-text">Uploading...</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="batch-progress" style="width:0%"></div>
+          </div>
         </div>
+
+        <div class="status-message" id="status-message" style="display:none"></div>
+
+        <div class="uploads-grid" id="uploads-grid"></div>
+
+        <button class="btn btn-secondary" id="btn-done" style="display:none">I'm done — thank you!</button>
       </div>
-
-      <button class="btn btn-secondary" onclick="showThankYou()" style="margin-bottom:20px;">
-        I'm done — thank you!
-      </button>
     </div>
 
     <!-- Screen 3: Thank You -->
     <div class="screen" id="screen-thanks">
-      <div class="card thank-you">
-        <div class="icon">💐</div>
+      <div class="card thank-you-card">
+        <div class="thank-you-icon">💐</div>
         <h2>Thank You!</h2>
         <p>Your photos and videos will be cherished as part of our wedding memories.</p>
+        <button class="btn btn-secondary" id="btn-more">Upload more photos</button>
       </div>
-      <button class="btn btn-secondary" onclick="backToUpload()">
-        Upload more photos
-      </button>
+    </div>
+
+    <!-- Screen 4: Admin -->
+    <div class="screen" id="screen-admin">
+      <div class="card admin-container">
+        <h2>Admin Dashboard</h2>
+        <div id="admin-login">
+          <div class="form-group">
+            <label class="form-label" for="admin-pw">Admin Password</label>
+            <input type="password" id="admin-pw" class="form-input" placeholder="Enter password">
+          </div>
+          <button class="btn btn-primary" id="btn-admin-login">Login</button>
+        </div>
+        <div id="admin-content" style="display:none">
+          <button class="btn btn-secondary" id="btn-admin-refresh" style="margin-bottom:1.5rem">Refresh</button>
+          <h3>Stats</h3>
+          <div class="stats-grid" id="stats-grid"></div>
+          <h3>Guests</h3>
+          <div class="table-wrapper" id="guests-table"></div>
+        </div>
+      </div>
     </div>
 
     <div class="footer">Made with love for a beautiful celebration</div>
