@@ -1,0 +1,6 @@
+[Unit]
+Description=Publish current Cloudflare tunnel URL to GitHub Pages redirect
+
+[Service]
+Type=oneshot
+ExecStart=/opt/wedding-photos/quick-tunnel/publish-url.sh

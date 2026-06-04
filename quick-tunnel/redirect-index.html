@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Share Your Wedding Photos</title>
+  <!-- This URL is rewritten automatically by publish-url.sh -->
+  <meta http-equiv="refresh" content="0; url=__TUNNEL_URL__">
+  <link rel="canonical" href="__TUNNEL_URL__">
+  <style>
+    body { font-family: -apple-system, system-ui, sans-serif; background:#faf8f5; color:#2c2825;
+           display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; text-align:center; }
+    .box { padding:2rem; }
+    a { color:#8c6f58; }
+    .spinner { width:28px; height:28px; border:3px solid #e8e2dc; border-top-color:#8c6f58;
+               border-radius:50%; animation:spin .8s linear infinite; margin:1rem auto; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+  </style>
+  <script>
+    // Belt-and-suspenders: also redirect via JS in case meta refresh is blocked
+    window.location.replace("__TUNNEL_URL__");
+  </script>
+</head>
+<body>
+  <div class="box">
+    <div class="spinner"></div>
+    <p>Taking you to the photo uploader…</p>
+    <p>If nothing happens, <a href="__TUNNEL_URL__">tap here</a>.</p>
+  </div>
+</body>
+</html>

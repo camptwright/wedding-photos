@@ -1,0 +1,14 @@
+[Unit]
+Description=Cloudflare Quick Tunnel for Wedding Photos
+After=network-online.target wedding-photos.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Logs the assigned trycloudflare.com URL to a file we can parse
+ExecStart=/usr/local/bin/cloudflared tunnel --no-autoupdate --url http://localhost:3000 --logfile /var/log/wedding-tunnel.log --loglevel info
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
