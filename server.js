@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 
 // ─── Config ────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
-const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, 'uploads');
+const UPLOAD_DIR = path.resolve(process.env.UPLOAD_DIR || path.join(__dirname, 'uploads'));
 const MAX_UPLOADS_PER_GUEST = parseInt(process.env.MAX_UPLOADS_PER_GUEST || '50');
 const MAX_FILE_SIZE_MB = parseInt(process.env.MAX_FILE_SIZE_MB || '100');
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'changeme2026';
