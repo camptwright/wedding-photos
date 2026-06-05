@@ -137,6 +137,19 @@ async function loadMyUploads() {
   } catch (e) { console.error('Failed to load uploads:', e); }
 }
 
+function uploadFileUrl(upload) {
+  // Public gallery endpoint serves files without auth — works in <img>/<video>
+  return `/api/gallery/file/${upload.guest_id}/${upload.stored_name}`;
+}
+
+function thumbFallback(isVideo) {
+  const bg = isVideo ? '#e8e2dc' : '#f0ece8';
+  const inner = isVideo
+    ? `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8a8480" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>`
+    : `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b8977e" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+  return `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:${bg}">${inner}</div>`;
+}
+
 function renderThumbnails() {
   const grid = document.getElementById('uploads-grid');
   grid.innerHTML = '';
@@ -144,22 +157,33 @@ function renderThumbnails() {
     const thumb = document.createElement('div');
     thumb.className = 'upload-thumb';
     const isVideo = upload.mime_type.startsWith('video/');
+
     if (isVideo) {
-      thumb.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#e8e2dc">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8a8480" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      </div><span class="video-badge">Video</span>`;
+      const video = document.createElement('video');
+      video.src = `${uploadFileUrl(upload)}#t=0.1`;
+      video.muted = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      // If the video frame can't render, show the placeholder icon instead
+      video.onerror = () => { video.remove(); thumb.insertAdjacentHTML('afterbegin', thumbFallback(true)); };
+      thumb.appendChild(video);
+      thumb.insertAdjacentHTML('beforeend', `<span class="video-badge">Video</span>`);
     } else {
-      thumb.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f0ece8">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b8977e" stroke-width="1.5">
-          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-        </svg>
-      </div>`;
+      const img = document.createElement('img');
+      img.loading = 'lazy';
+      img.alt = '';
+      img.src = uploadFileUrl(upload);
+      // Raw HEIC or any load failure falls back to the icon so the tile isn't broken
+      img.onerror = () => { img.remove(); thumb.insertAdjacentHTML('afterbegin', thumbFallback(false)); };
+      thumb.appendChild(img);
     }
+
     const delBtn = document.createElement('button');
     delBtn.className = 'delete-btn';
     delBtn.textContent = '×';
     delBtn.onclick = (e) => { e.stopPropagation(); deleteUpload(upload.id); };
     thumb.appendChild(delBtn);
+
     grid.appendChild(thumb);
   }
   if (state.uploads.length > 0) document.getElementById('btn-done').style.display = 'block';
