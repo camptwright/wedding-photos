@@ -133,6 +133,17 @@ function connectStream() {
     el.liveDot.classList.add('offline');
     // EventSource auto-reconnects; polling keeps us fresh meanwhile
   });
+
+  es.addEventListener('removephoto', (ev) => {
+    try {
+      const { id } = JSON.parse(ev.data);
+      state.photos = state.photos.filter(p => p.id !== id);
+      state.queue = state.queue.filter(q => q !== id);
+      state.freshQueue = state.freshQueue.filter(q => q !== id);
+      state.seen.delete(id);
+      updateCount();
+    } catch (e) { /* ignore */ }
+  });
 }
 
 // ─── Slideshow loop ─────────────────────────────────────────────────────────────

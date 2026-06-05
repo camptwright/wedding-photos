@@ -1,0 +1,49 @@
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#faf8f5;--card:#fff;--ink:#2c2825;--muted:#8a8480;
+  --accent:#b8977e;--accent-dark:#8c6f58;--border:#e8e2dc;
+  --danger:#c0584b;--danger-bg:#f6e3df;--ok:#7a9e7e;
+  --display:'Cormorant Garamond',Georgia,serif;--body:'Outfit',system-ui,sans-serif;
+}
+body{font-family:var(--body);font-weight:300;background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.6}
+.wrap{max-width:1000px;margin:0 auto;padding:2rem 1.25rem 4rem}
+header{text-align:center;margin-bottom:1.75rem}
+header h1{font-family:var(--display);font-weight:300;font-size:2.4rem}
+header .sub{color:var(--muted);font-size:.95rem}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;max-width:380px;margin:2rem auto;box-shadow:0 2px 20px rgba(44,40,37,.05)}
+.card label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.5rem}
+.card input{width:100%;padding:.8rem 1rem;border:1px solid var(--border);border-radius:10px;font:inherit;font-size:1rem;outline:none}
+.card input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(184,151,126,.15)}
+.btn{display:inline-block;width:100%;margin-top:1rem;padding:.8rem 1.5rem;border:none;border-radius:10px;background:var(--accent-dark);color:#fff;font:inherit;font-size:.95rem;cursor:pointer;transition:.2s}
+.btn:hover{background:#7a5e47}
+.btn.ghost{background:transparent;color:var(--accent-dark);border:1px solid var(--border);width:auto}
+.btn.ghost:hover{background:var(--bg);border-color:var(--accent)}
+.btn.small{padding:.4rem .9rem;font-size:.8rem;margin-top:.5rem}
+.err{color:var(--danger);font-size:.85rem;margin-top:.75rem;text-align:center}
+
+.stats{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;margin-bottom:1.5rem}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:.85rem 1.25rem;text-align:center;min-width:90px}
+.stat .num{font-family:var(--display);font-weight:600;font-size:1.7rem;color:var(--accent-dark)}
+.stat .lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.stats .btn{margin:0 0 0 auto}
+
+.todo{background:#fff;border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem}
+.todo-head strong{font-weight:500}
+.todo-hint{display:block;font-size:.8rem;color:var(--muted);margin-top:.15rem}
+.todo ul{list-style:none;margin:.75rem 0 0;display:flex;flex-direction:column;gap:.3rem}
+.todo li{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:.35rem .6rem;display:flex;justify-content:space-between;gap:1rem}
+.todo li .who{color:var(--muted);font-family:var(--body)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.85rem}
+.tile{position:relative;background:var(--border);border-radius:10px;overflow:hidden;aspect-ratio:1}
+.tile img,.tile video{width:100%;height:100%;object-fit:cover;display:block}
+.tile .meta{position:absolute;left:0;right:0;bottom:0;padding:.6rem .55rem .45rem;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);color:#fff;font-size:.75rem}
+.tile .badge{position:absolute;top:.4rem;left:.4rem;background:rgba(0,0,0,.6);color:#fff;font-size:.6rem;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;border-radius:5px}
+.tile .del{position:absolute;top:.4rem;right:.4rem;width:30px;height:30px;border:none;border-radius:50%;background:rgba(192,88,75,.92);color:#fff;font-size:1rem;line-height:30px;text-align:center;cursor:pointer;opacity:.92;transition:.15s}
+.tile .del:hover{opacity:1;transform:scale(1.08)}
+.empty{text-align:center;color:var(--muted);padding:3rem 1rem;font-family:var(--display);font-style:italic;font-size:1.3rem}
+
+.toast{position:fixed;left:50%;bottom:1.5rem;transform:translateX(-50%) translateY(150%);background:var(--ink);color:#fff;padding:.8rem 1.25rem;border-radius:10px;font-size:.9rem;max-width:90vw;transition:transform .3s;z-index:50;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.danger{background:var(--danger)}

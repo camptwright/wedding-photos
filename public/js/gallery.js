@@ -141,6 +141,15 @@ function connectStream() {
       if (added) renderGallery();
     } catch (e) { /* ignore */ }
   });
+
+  es.addEventListener('removephoto', (ev) => {
+    try {
+      const { id } = JSON.parse(ev.data);
+      const before = state.photos.length;
+      state.photos = state.photos.filter(p => p.id !== id);
+      if (state.photos.length !== before) renderGallery();
+    } catch (e) { /* ignore */ }
+  });
 }
 
 function escHtml(str) {

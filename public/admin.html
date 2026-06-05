@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Wedding Photos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Photo Admin</h1>
+      <p class="sub" id="sub">Manage and remove uploaded photos</p>
+    </header>
+
+    <!-- Login -->
+    <div id="login" class="card">
+      <label for="pw">Admin password</label>
+      <input type="password" id="pw" placeholder="Enter admin password" autocomplete="current-password">
+      <button id="btn-unlock" class="btn">Unlock</button>
+      <p class="err" id="login-err" style="display:none">Incorrect password.</p>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dash" style="display:none">
+      <div class="stats">
+        <div class="stat"><div class="num" id="stat-count">0</div><div class="lbl">Photos</div></div>
+        <div class="stat"><div class="num" id="stat-guests">0</div><div class="lbl">Guests</div></div>
+        <div class="stat"><div class="num" id="stat-size">0 MB</div><div class="lbl">Storage</div></div>
+        <button id="btn-refresh" class="btn ghost">Refresh</button>
+      </div>
+
+      <!-- Apple Photos removal reminder list -->
+      <div id="photos-todo" class="todo" style="display:none">
+        <div class="todo-head">
+          <strong>Also remove these from Apple Photos</strong>
+          <span class="todo-hint">Open Photos on the Mac Mini, search each filename, delete it. (Apple blocks scripted deletion.)</span>
+        </div>
+        <ul id="todo-list"></ul>
+        <button id="btn-clear-todo" class="btn ghost small">Clear list</button>
+      </div>
+
+      <div id="grid" class="grid"></div>
+      <div id="empty" class="empty" style="display:none">No photos uploaded yet.</div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

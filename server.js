@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 
 // ─── Config ────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
-const UPLOAD_DIR = path.resolve(process.env.UPLOAD_DIR || path.join(__dirname, 'uploads'));
+const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, 'uploads');
 const MAX_UPLOADS_PER_GUEST = parseInt(process.env.MAX_UPLOADS_PER_GUEST || '50');
 const MAX_FILE_SIZE_MB = parseInt(process.env.MAX_FILE_SIZE_MB || '100');
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'changeme2026';
@@ -96,6 +96,13 @@ const galleryClients = new Set();
 
 function broadcastNewPhotos(photos) {
   const payload = `event: newphotos\ndata: ${JSON.stringify(photos)}\n\n`;
+  for (const client of [...wallClients, ...galleryClients]) {
+    try { client.write(payload); } catch (e) { /* client gone */ }
+  }
+}
+
+function broadcastRemovedPhoto(id) {
+  const payload = `event: removephoto\ndata: ${JSON.stringify({ id })}\n\n`;
   for (const client of [...wallClients, ...galleryClients]) {
     try { client.write(payload); } catch (e) { /* client gone */ }
   }
@@ -259,6 +266,41 @@ app.get('/api/admin/file/:guestId/:filename', adminAuth, (req, res) => {
   res.sendFile(filePath);
 });
 
+// Full photo list for the admin dashboard
+app.get('/api/admin/photos', adminAuth, (req, res) => {
+  const photos = queryAll(
+    'SELECT u.id, u.guest_id, u.stored_name, u.original_name, u.mime_type, u.uploaded_at, u.synced_at, g.name as guest_name ' +
+    'FROM uploads u JOIN guests g ON u.guest_id = g.id ORDER BY u.uploaded_at DESC'
+  );
+  res.json({ photos, total: photos.length });
+});
+
+// Admin delete: removes ANY photo from the DB + disk, and tells live views to drop it.
+// (Apple Photos can't be scripted to delete — the response returns the filename so
+//  the owner can quickly find and remove it in the Photos app manually.)
+app.delete('/api/admin/upload/:id', adminAuth, (req, res) => {
+  const upl = queryOne('SELECT * FROM uploads WHERE id = ?', [req.params.id]);
+  if (!upl) return res.status(404).json({ error: 'Photo not found' });
+
+  const guestName = (queryOne('SELECT name FROM guests WHERE id = ?', [upl.guest_id]) || {}).name || 'Guest';
+  const filePath = path.join(UPLOAD_DIR, upl.guest_id, upl.stored_name);
+  if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+  run('DELETE FROM uploads WHERE id = ?', [req.params.id]);
+
+  broadcastRemovedPhoto(req.params.id);
+
+  res.json({
+    deleted: true,
+    id: req.params.id,
+    guest_name: guestName,
+    stored_name: upl.stored_name,
+    original_name: upl.original_name,
+    // The sync script imports files named "<guest>_<stored_name>" into Photos,
+    // so this is what to search for in the Photos app to remove it there.
+    photos_search: upl.stored_name.replace(/\.[^.]+$/, '')
+  });
+});
+
 // ─── Photo Wall ──────────────────────────────────────────────────────────────
 // Token-gated so the wall URL can be opened on a display without exposing
 // photos to anyone who guesses the domain. Token is passed as ?key= because
@@ -352,6 +394,9 @@ app.get('/wall', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'wa
 
 // Wedding gallery page
 app.get('/gallery', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'gallery.html')); });
+
+// Admin dashboard page (delete/moderation)
+app.get('/admin', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'admin.html')); });
 
 app.get('*', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'index.html')); });
 
