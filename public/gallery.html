@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#FDF4E7">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Wedding Gallery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/gallery.css">
+</head>
+<body>
+
+  <div class="bg-photo">
+    <img src="/img/couple.jpg" alt="">
+    <div class="bg-frost"></div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <div id="couple-names" class="couple-names">Our Wedding</div>
+      <div id="wedding-date" class="wedding-date"></div>
+      <div class="header-divider"></div>
+      <div class="photo-count"><span id="photo-count">0</span> memories shared</div>
+    </div>
+
+    <a href="/wall" class="wall-live-btn">
+      <span class="wall-live-dot"></span>
+      <span class="wall-live-label">Watch the Live Wall</span>
+      <span class="wall-live-arrow">↗</span>
+    </a>
+
+    <div id="gallery-grid" class="masonry-grid"></div>
+
+    <div id="empty-state" class="empty-state" style="display:none">
+      <div class="empty-icon">📷</div>
+      <p>No photos yet — be the first to share!</p>
+      <a href="/" class="btn btn-primary" style="max-width:220px;margin:1rem auto 0;">Upload Photos</a>
+    </div>
+
+    <div class="footer-links">
+      <a href="/" class="upload-back-link">📷 &nbsp;Upload your photos</a>
+    </div>
+
+    <div class="footer">Made with love for a beautiful celebration</div>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="lightbox" onclick="handleLightboxClick(event)">
+    <div class="lightbox-inner" onclick="event.stopPropagation()">
+      <div class="lightbox-header">
+        <div id="lightbox-name" class="lightbox-name"></div>
+        <div class="lightbox-controls">
+          <span id="lightbox-counter" class="lightbox-counter"></span>
+          <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+        </div>
+      </div>
+      <div id="lightbox-media" class="lightbox-media"></div>
+      <div class="lightbox-footer">
+        <button class="lightbox-nav-btn" onclick="prevPhoto()">‹</button>
+        <button class="lightbox-nav-btn" onclick="nextPhoto()">›</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/gallery.js"></script>
+</body>
+</html>

@@ -92,17 +92,18 @@ function run(sql, params = []) {
 
 // ─── Photo Wall: live update broadcasting (SSE) ──────────────────────────────
 const wallClients = new Set();
+const galleryClients = new Set();
 
 function broadcastNewPhotos(photos) {
   const payload = `event: newphotos\ndata: ${JSON.stringify(photos)}\n\n`;
-  for (const client of wallClients) {
+  for (const client of [...wallClients, ...galleryClients]) {
     try { client.write(payload); } catch (e) { /* client gone */ }
   }
 }
 
 // Heartbeat keeps SSE connections alive through proxies/tunnels
 setInterval(() => {
-  for (const client of wallClients) {
+  for (const client of [...wallClients, ...galleryClients]) {
     try { client.write(': keep-alive\n\n'); } catch (e) { /* ignore */ }
   }
 }, 20000);
@@ -314,8 +315,43 @@ app.use((err, req, res, next) => {
   next();
 });
 
+// ─── Gallery (public, no auth) ─────────────────────────────────────────────
+app.get('/api/gallery/config', (req, res) => {
+  res.json({ coupleNames: COUPLE_NAMES, weddingDate: WEDDING_DATE, slideSeconds: WALL_SLIDE_SECONDS });
+});
+
+app.get('/api/gallery/photos', (req, res) => {
+  const photos = queryAll(
+    'SELECT u.id, u.guest_id, u.stored_name, u.mime_type, u.uploaded_at, g.name as guest_name ' +
+    'FROM uploads u JOIN guests g ON u.guest_id = g.id ORDER BY u.uploaded_at DESC'
+  );
+  res.json({ photos, total: photos.length });
+});
+
+app.get('/api/gallery/file/:guestId/:filename', (req, res) => {
+  const filePath = path.join(UPLOAD_DIR, req.params.guestId, req.params.filename);
+  if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'File not found' });
+  res.sendFile(filePath);
+});
+
+app.get('/api/gallery/stream', (req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+    'X-Accel-Buffering': 'no',
+  });
+  res.write('retry: 5000\n\n');
+  res.write(': connected\n\n');
+  galleryClients.add(res);
+  req.on('close', () => { galleryClients.delete(res); });
+});
+
 // Photo wall display page
 app.get('/wall', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'wall.html')); });
+
+// Wedding gallery page
+app.get('/gallery', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'gallery.html')); });
 
 app.get('*', (req, res) => { res.sendFile(path.join(__dirname, 'public', 'index.html')); });
 

@@ -1,6 +1,18 @@
 // ─── Photo Wall Engine ──────────────────────────────────────────────────────
 const KEY = new URLSearchParams(window.location.search).get('key') || '';
 
+// When no key is provided, use the public gallery API routes
+function apiUrl(path) {
+  return KEY
+    ? `/api/wall/${path}?key=${encodeURIComponent(KEY)}`
+    : `/api/gallery/${path}`;
+}
+function fileUrl(p) {
+  return KEY
+    ? `/api/wall/file/${p.guest_id}/${p.stored_name}?key=${encodeURIComponent(KEY)}`
+    : `/api/gallery/file/${p.guest_id}/${p.stored_name}`;
+}
+
 const state = {
   config: { slideSeconds: 7, coupleNames: 'Our Wedding' },
   photos: [],            // all known photos (objects)
@@ -28,16 +40,10 @@ const el = {
   errorMsg: document.getElementById('error-message'),
 };
 
-function fileUrl(p) {
-  return `/api/wall/file/${p.guest_id}/${p.stored_name}?key=${encodeURIComponent(KEY)}`;
-}
-
 // ─── Init ────────────────────────────────────────────────────────────────────
 async function init() {
-  if (!KEY) return showError();
-
   try {
-    const cfgRes = await fetch(`/api/wall/config?key=${encodeURIComponent(KEY)}`);
+    const cfgRes = await fetch(apiUrl('config'));
     if (cfgRes.status === 403) return showError();
     state.config = await cfgRes.json();
     el.coupleNames.textContent = state.config.coupleNames;
@@ -66,7 +72,7 @@ function requestFullscreen() {
 // ─── Load photos ──────────────────────────────────────────────────────────────
 async function loadPhotos(isInitial) {
   try {
-    const res = await fetch(`/api/wall/photos?key=${encodeURIComponent(KEY)}`);
+    const res = await fetch(apiUrl('photos'));
     if (!res.ok) return;
     const data = await res.json();
 
@@ -99,7 +105,7 @@ async function loadPhotos(isInitial) {
 
 // ─── Live stream (SSE) ─────────────────────────────────────────────────────────
 function connectStream() {
-  const es = new EventSource(`/api/wall/stream?key=${encodeURIComponent(KEY)}`);
+  const es = new EventSource(apiUrl('stream'));
 
   es.addEventListener('open', () => el.liveDot.classList.remove('offline'));
 
